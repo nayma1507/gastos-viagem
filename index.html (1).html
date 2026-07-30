@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1420">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gastos Viagem">
+<title>Gastos da Viagem — Orlando</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--bg:#0f1420;--card:#1a2233;--card2:#212b40;--line:#2c3852;--txt:#e8edf6;--muted:#93a1bd;--accent:#00d18f;--accent2:#4c8dff;--warn:#ffb020;--danger:#ff5a6e;--disney:#c084fc;--rose:#ff6fae;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--txt);padding:16px;line-height:1.45}
+  .wrap{max-width:680px;margin:0 auto}
+  h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  .card h2{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  input,select{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:12px;font-size:16px;margin-bottom:12px}
+  .row{display:flex;gap:10px}.row>div{flex:1}
+  .seg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .seg button{flex:1;min-width:90px;background:var(--card2);border:1px solid var(--line);color:var(--muted);padding:11px 8px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600}
+  .seg button.on{background:var(--disney);border-color:var(--disney);color:#1a0f2e}
+  .btn{width:100%;background:var(--accent);color:#06231a;border:none;padding:14px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:800}
+  .btn:active{transform:translateY(1px)}
+  .btn.blue{background:var(--accent2);color:#fff}
+  .btn.sm{width:auto;padding:10px 20px;font-size:14px;flex:none}
+  .cfgActions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+  .owners{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+  .owner{border-radius:12px;padding:14px;border:1px solid var(--line)}
+  .owner.nayma{background:linear-gradient(160deg,rgba(76,141,255,.16),transparent)}
+  .owner.irene{background:linear-gradient(160deg,rgba(255,111,174,.16),transparent)}
+  .owner .who{font-size:12px;color:var(--muted);font-weight:700}
+  .owner .saldo{font-size:24px;font-weight:800;margin-top:4px}
+  .owner.nayma .saldo{color:var(--accent2)} .owner.irene .saldo{color:var(--rose)}
+  .owner .det{font-size:11px;color:var(--muted);margin-top:2px}
+  .owner .catline{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+  .owner .catline span{font-weight:700;color:var(--txt)}
+  .owner .saldo{margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+  .owner{cursor:pointer;transition:.15s} .owner:active{transform:scale(.98)}
+  .owner.nayma.active{outline:2px solid var(--accent2)} .owner.irene.active{outline:2px solid var(--rose)}
+  .filterbar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:6px 2px 10px;flex-wrap:wrap}
+  .filterbar button{background:var(--card2);border:1px solid var(--line);color:var(--accent);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:600}
+  .accs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .acc{background:var(--card2);border-radius:12px;padding:12px}
+  .acc .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .acc .v{font-size:18px;font-weight:800;margin-top:3px}
+  .acc .s{font-size:11px;color:var(--muted);margin-top:2px}
+  .totline{margin-top:10px;text-align:center;font-size:13px;color:var(--muted)}
+  .totline b{color:var(--warn);font-size:16px}
+  .exp{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line)}
+  .exp:last-child{border-bottom:none}
+  .exp .desc{flex:1;min-width:0}
+  .exp .desc .nm{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .exp .desc .meta{font-size:11px;color:var(--muted);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:9px}
+  .tag.inter{background:rgba(76,141,255,.16);color:var(--accent2)} .tag.nomad{background:rgba(0,209,143,.16);color:var(--accent)}
+  .tag.split{background:rgba(192,132,252,.16);color:var(--disney)} .tag.nayma{background:rgba(76,141,255,.16);color:var(--accent2)} .tag.irene{background:rgba(255,111,174,.16);color:var(--rose)}
+  .tag.cat{background:rgba(126,224,214,.16);color:#7ee0d6}
+  .exp .val{font-weight:800;font-size:15px;white-space:nowrap}
+  .exp .del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 6px}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
+  .mini{display:flex;gap:8px;margin-top:12px}
+  .mini button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--muted);padding:9px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer}
+  .mini button.danger{color:var(--danger)}
+  .foot{text-align:center;color:var(--muted);font-size:11px;margin-top:8px;opacity:.8}
+  .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--accent);color:#06231a;padding:11px 18px;border-radius:12px;font-weight:700;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.3s;z-index:99}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  details summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:600}
+  .hint{font-size:11px;color:var(--muted);margin:-6px 0 12px}
+  summary.cfgsum{display:flex;justify-content:space-between;align-items:center;gap:8px;list-style:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  summary.cfgsum::-webkit-details-marker{display:none}
+  summary.cfgsum #cfgSummary{font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);font-size:12px;text-align:right}
+  .cfgbody{margin-top:14px}
+  #login{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+  #login .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 22px;max-width:340px;width:100%;text-align:center}
+  #login h2{font-size:20px;font-weight:800;margin-bottom:6px;color:var(--txt)}
+  #login p{color:var(--muted);font-size:13px;margin-bottom:16px}
+  #login input{text-align:center;font-size:22px;letter-spacing:6px}
+  #login .err{color:var(--danger);font-size:12px;min-height:16px;margin-top:6px}
+</style>
+</head>
+<body>
+<div id="login"><div class="box">
+  <div style="font-size:42px">🔒</div>
+  <h2>Gastos da Viagem</h2>
+  <p>Digite a senha para acessar</p>
+  <input type="password" id="loginPass" inputmode="numeric" placeholder="senha" autocomplete="off">
+  <button class="btn" id="loginBtn" style="margin-top:6px">Entrar</button>
+  <div class="err" id="loginErr"></div>
+</div></div>
+<div class="wrap">
+  <h1>💵 Gastos da Viagem — Orlando</h1>
+  <div class="sub">Registre cada gasto em dólar. Tudo fica salvo neste aparelho automaticamente.</div>
+  <div class="toast" id="toast"></div>
+
+  <!-- 1) SALDOS INICIAIS (recolhível) -->
+  <div class="card">
+    <details id="cfgDetails">
+      <summary class="cfgsum"><span>💰 Saldos iniciais</span><span id="cfgSummary">toque para configurar</span></summary>
+      <div class="cfgbody">
+        <label>Contas (onde o dinheiro está)</label>
+        <div class="row">
+          <div><label>Inter (US$)</label><input type="number" id="cfgInter" step="0.01" inputmode="decimal" placeholder="0,00"></div>
+          <div><label>Nomad (US$)</label><input type="number" id="cfgNomad" step="0.01" inputmode="decimal" placeholder="0,00"></div>
+        </div>
+        <label>Aportes Família Nayma (US$)</label>
+        <div class="row">
+          <div><label>🍽️ Alimentação</label><input type="number" id="cfgApNali" step="0.01" inputmode="decimal" placeholder="0,00"></div>
+          <div><label>🧾 Despesas Gerais</label><input type="number" id="cfgApNdes" step="0.01" inputmode="decimal" placeholder="0,00"></div>
+        </div>
+        <label>Aportes Irene (US$)</label>
+        <div class="row">
+          <div><label>🍽️ Alimentação</label><input type="number" id="cfgApIali" step="0.01" inputmode="decimal" placeholder="0,00"></div>
+          <div><label>🧾 Despesas Gerais</label><input type="number" id="cfgApIdes" step="0.01" inputmode="decimal" placeholder="0,00"></div>
+        </div>
+        <details>
+          <summary>Pesos do rateio dividido (padrão 75/25)</summary>
+          <div class="row" style="margin-top:10px">
+            <div><label>Família Nayma (%)</label><input type="number" id="cfgWN" step="1" value="75"></div>
+            <div><label>Irene (%)</label><input type="number" id="cfgWI" step="1" value="25"></div>
+          </div>
+        </details>
+        <div class="cfgActions">
+          <div class="hint" id="cfgCheck" style="margin:0;flex:1"></div>
+          <button class="btn blue sm" id="saveCfg">Salvar e ocultar</button>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 2) NOVO GASTO -->
+  <div class="card">
+    <h2>➕ Novo gasto</h2>
+    <label>Descrição</label>
+    <input type="text" id="desc" placeholder="Ex.: Gasolina, Almoço, Ingresso...">
+    <div class="row">
+      <div><label>Valor (US$)</label><input type="number" id="valor" inputmode="decimal" step="0.01" placeholder="0,00"></div>
+      <div><label>Conta</label><select id="conta"><option>Inter</option><option>Nomad</option></select></div>
+    </div>
+    <label>Data <span style="font-weight:400;text-transform:none;letter-spacing:0">— só preencha se for retroativo</span></label>
+    <input type="date" id="dataIn">
+    <label>Categoria</label>
+    <div class="seg" id="segCat">
+      <button data-c="ali" class="on">🍽️ Alimentação</button>
+      <button data-c="des">🧾 Despesas Gerais</button>
+    </div>
+    <label>Rateio</label>
+    <div class="seg" id="seg">
+      <button data-r="split" class="on">Dividir <b id="segSplit">75/25</b></button>
+      <button data-r="nayma">Só Família Nayma</button>
+      <button data-r="irene">Só Irene</button>
+    </div>
+    <button class="btn" id="add">Adicionar gasto</button>
+  </div>
+
+  <!-- 3) SALDOS POR RESPONSÁVEL -->
+  <div class="card">
+    <h2>📊 Saldos</h2>
+    <div class="owners">
+      <div class="owner nayma" id="ownNayma">
+        <div class="who">👨‍👩‍👦 Família Nayma</div>
+        <div class="catline">🍽️ Alimentação<span id="sNali">$ 0,00</span></div>
+        <div class="catline">🧾 Despesas<span id="sNdes">$ 0,00</span></div>
+        <div class="saldo" id="sNayma">$ 0,00</div><div class="det">saldo total</div>
+      </div>
+      <div class="owner irene" id="ownIrene">
+        <div class="who">👩 Irene</div>
+        <div class="catline">🍽️ Alimentação<span id="sIali">$ 0,00</span></div>
+        <div class="catline">🧾 Despesas<span id="sIdes">$ 0,00</span></div>
+        <div class="saldo" id="sIrene">$ 0,00</div><div class="det">saldo total</div>
+      </div>
+    </div>
+    <div class="hint" style="margin:8px 0 0;text-align:center">👆 toque num responsável para ver só os gastos dele</div>
+    <div class="accs">
+      <div class="acc"><div class="l">Inter — resta</div><div class="v" id="rInter">$ 0,00</div><div class="s" id="gInter"></div></div>
+      <div class="acc"><div class="l">Nomad — resta</div><div class="v" id="rNomad">$ 0,00</div><div class="s" id="gNomad"></div></div>
+    </div>
+    <div class="totline">Total gasto: <b id="totGasto">$ 0,00</b></div>
+  </div>
+
+  <!-- 4) LANÇAMENTOS -->
+  <div class="card">
+    <h2>🧾 Lançamentos (<span id="count">0</span>)</h2>
+    <div id="lista"><div class="empty">Nenhum gasto ainda. Adicione o primeiro acima. ✈️</div></div>
+    <div class="mini">
+      <button id="exportBtn">⬇️ Backup</button>
+      <button id="importBtn">⬆️ Importar</button>
+      <button id="clearBtn" class="danger">🗑️ Limpar</button>
+      <button id="lockBtn">🔒 Sair</button>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none">
+  </div>
+  <div class="foot">Os dados ficam só neste navegador/aparelho. Faça "Backup" de vez em quando para não perder.</div>
+</div>
+
+<script>
+// ---- Login (senha cifrada) ----
+const PWHASH='c77639710bd89eea8855346472b0eb9175987e0eaeb35df92b1712ca09215f05';
+function sha256(ascii){function r(v,a){return (v>>>a)|(v<<(32-a));}var mp=Math.pow,mw=mp(2,32),res='',words=[],bl=ascii.length*8;var hash=sha256.h=sha256.h||[],k=sha256.k=sha256.k||[],pc=k.length,ic={};for(var cand=2;pc<64;cand++){if(!ic[cand]){for(var i=0;i<313;i+=cand){ic[i]=cand;}hash[pc]=(mp(cand,.5)*mw)|0;k[pc++]=(mp(cand,1/3)*mw)|0;}}ascii+='\x80';while(ascii.length%64-56)ascii+='\x00';for(i=0;i<ascii.length;i++){var j=ascii.charCodeAt(i);if(j>>8)return;words[i>>2]|=j<<((3-i)%4)*8;}words[words.length]=(bl/mw)|0;words[words.length]=bl;for(j=0;j<words.length;){var w=words.slice(j,j+=16),oh=hash;hash=hash.slice(0,8);for(i=0;i<64;i++){var w15=w[i-15],w2=w[i-2],a=hash[0],e=hash[4];var t1=hash[7]+(r(e,6)^r(e,11)^r(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(r(w15,7)^r(w15,18)^(w15>>>3))+w[i-7]+(r(w2,17)^r(w2,19)^(w2>>>10)))|0);var t2=(r(a,2)^r(a,13)^r(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));hash=[(t1+t2)|0].concat(hash);hash[4]=(hash[4]+t1)|0;}for(i=0;i<8;i++){hash[i]=(hash[i]+oh[i])|0;}}for(i=0;i<8;i++){for(j=3;j+1;j--){var b=(hash[i]>>(j*8))&255;res+=((b<16)?0:'')+b.toString(16);}}return res;}
+function unlock(){document.getElementById('login').style.display='none';}
+function tryLogin(){const v=document.getElementById('loginPass').value;if(sha256(v)===PWHASH){unlock();}else{document.getElementById('loginErr').textContent='Senha incorreta.';document.getElementById('loginPass').value='';}}
+document.getElementById('loginBtn').onclick=tryLogin;
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+document.getElementById('loginPass').focus();
+
+const LS_EXP='gv_expenses', LS_CFG='gv_config';
+// ===== SUPABASE (cole suas chaves aqui para ativar a nuvem) =====
+const SUPABASE_URL='https://panmqgfiyulfeuiicgrk.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhbm1xZ2ZpeXVsZmV1aWljZ3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MjUwNjcsImV4cCI6MjEwMTAwMTA2N30.TCEwETMfI-FfWE0ct55LZ8zPKRvW7_hePllXjLlyUFM';
+const sb=(window.supabase && /^https?:\/\//.test(SUPABASE_URL))?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+// ================================================================
+let expenses=[], cfg={inter:0,nomad:0,apNali:0,apNdes:0,apIali:0,apIdes:0,wN:75,wI:25}, rateio='split', catSel='ali', filterOwner=null;
+const fmt=n=>(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+let _tt=null; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2500);}
+const $=id=>document.getElementById(id);
+
+function load(){
+  try{expenses=JSON.parse(localStorage.getItem(LS_EXP))||[];}catch(e){expenses=[];}
+  try{const c=JSON.parse(localStorage.getItem(LS_CFG)); if(c)cfg=Object.assign(cfg,c);}catch(e){}
+  $('cfgInter').value=cfg.inter||''; $('cfgNomad').value=cfg.nomad||'';
+  $('cfgApNali').value=cfg.apNali||''; $('cfgApNdes').value=cfg.apNdes||'';
+  $('cfgApIali').value=cfg.apIali||''; $('cfgApIdes').value=cfg.apIdes||'';
+  $('cfgWN').value=cfg.wN; $('cfgWI').value=cfg.wI;
+  $('segSplit').textContent=cfg.wN+'/'+cfg.wI;
+  updateCfgSummary(); $('cfgDetails').open=!configured();
+}
+function save(){localStorage.setItem(LS_EXP,JSON.stringify(expenses));localStorage.setItem(LS_CFG,JSON.stringify(cfg));
+  if(sb){sb.from('estado').upsert({id:1,data:{expenses,cfg}}).then(r=>{if(r.error)console.warn('Supabase save:',r.error.message);});}}
+async function cloudLoad(){ if(!sb) return; try{ const {data,error}=await sb.from('estado').select('data').eq('id',1).maybeSingle();
+  if(error){console.warn('Supabase load:',error.message);return;} if(data&&data.data){expenses=data.data.expenses||[];cfg=Object.assign(cfg,data.data.cfg||{});localStorage.setItem(LS_EXP,JSON.stringify(expenses));localStorage.setItem(LS_CFG,JSON.stringify(cfg));load();render();} }catch(e){console.warn(e);} }
+function cloudSubscribe(){ if(!sb) return; sb.channel('estado-rt').on('postgres_changes',{event:'*',schema:'public',table:'estado'},()=>cloudLoad()).subscribe(); }
+function configured(){return (cfg.inter||cfg.nomad||cfg.apNali||cfg.apNdes||cfg.apIali||cfg.apIdes)?true:false;}
+function updateCfgSummary(){const fam=(cfg.apNali||0)+(cfg.apNdes||0), ir=(cfg.apIali||0)+(cfg.apIdes||0);$('cfgSummary').textContent=configured()?('Fam $ '+fmt(fam)+' · Irene $ '+fmt(ir)+' · ✏️ editar'):'toque para configurar';}
+
+function shares(e){
+  if(e.rateio==='nayma') return {nayma:e.valor,irene:0};
+  if(e.rateio==='irene') return {nayma:0,irene:e.valor};
+  const tot=(cfg.wN+cfg.wI)||100;
+  return {nayma:e.valor*cfg.wN/tot, irene:e.valor*cfg.wI/tot};
+}
+
+function render(){
+  let total=0,gInter=0,gNomad=0,gNali=0,gNdes=0,gIali=0,gIdes=0;
+  expenses.forEach(e=>{total+=e.valor; if(e.conta==='Inter')gInter+=e.valor; else gNomad+=e.valor;
+    const s=shares(e), cat=e.cat||'des';
+    if(cat==='ali'){gNali+=s.nayma;gIali+=s.irene;} else {gNdes+=s.nayma;gIdes+=s.irene;}});
+  const sNali=(cfg.apNali||0)-gNali, sNdes=(cfg.apNdes||0)-gNdes, sIali=(cfg.apIali||0)-gIali, sIdes=(cfg.apIdes||0)-gIdes;
+  $('sNali').textContent='$ '+fmt(sNali); $('sNdes').textContent='$ '+fmt(sNdes);
+  $('sIali').textContent='$ '+fmt(sIali); $('sIdes').textContent='$ '+fmt(sIdes);
+  $('sNayma').textContent='$ '+fmt(sNali+sNdes); $('sIrene').textContent='$ '+fmt(sIali+sIdes);
+  const rI=(cfg.inter||0)-gInter, rN=(cfg.nomad||0)-gNomad;
+  $('rInter').textContent=(rI<0?'⚠️ ':'')+'$ '+fmt(rI); $('rInter').style.color=rI<-0.001?'var(--danger)':''; $('gInter').textContent='gasto $ '+fmt(gInter)+' de $ '+fmt(cfg.inter||0);
+  $('rNomad').textContent=(rN<0?'⚠️ ':'')+'$ '+fmt(rN); $('rNomad').style.color=rN<-0.001?'var(--danger)':''; $('gNomad').textContent='gasto $ '+fmt(gNomad)+' de $ '+fmt(cfg.nomad||0);
+  $('totGasto').textContent='$ '+fmt(total);
+  // lista (com filtro por responsável)
+  $('count').textContent=expenses.length;
+  const rlabel={split:'Rateio '+cfg.wN+'/'+cfg.wI,nayma:'Só Nayma',irene:'Só Irene'};
+  const clabel={ali:'🍽️ Alim.',des:'🧾 Desp.'};
+  let rows=expenses.map((e,i)=>({e,i}));
+  if(filterOwner) rows=rows.filter(o=>shares(o.e)[filterOwner]>0.0001);
+  let banner='';
+  if(filterOwner){const nome=filterOwner==='nayma'?'Família Nayma':'Irene'; banner='<div class="filterbar">🔎 Só <b>&nbsp;'+nome+'</b> — '+rows.length+' lançamento(s) <button id="clearF">ver todos</button></div>';}
+  if(!rows.length){$('lista').innerHTML=banner+'<div class="empty">Nenhum gasto'+(filterOwner?' desse responsável.':' ainda. Adicione o primeiro acima. ✈️')+'</div>';}
+  else{$('lista').innerHTML=banner+rows.map(o=>{const e=o.e; const val=filterOwner?shares(e)[filterOwner]:e.valor;
+    const extra=(filterOwner&&e.rateio==='split')?'<span class="tag split">parte de $ '+fmt(e.valor)+'</span>':'';
+    return '<div class="exp"><div class="desc"><div class="nm">'+(e.desc||'(sem descrição)')+'</div>'
+      +'<div class="meta"><span class="tag cat">'+clabel[e.cat||'des']+'</span><span class="tag '+e.conta.toLowerCase()+'">'+e.conta+'</span><span class="tag '+e.rateio+'">'+rlabel[e.rateio]+'</span>'+extra+'<span>'+(e.data||'')+'</span></div></div>'
+      +'<div class="val">$ '+fmt(val)+'</div><button class="del" data-i="'+o.i+'" title="Excluir">✕</button></div>';}).join('');
+  }
+  $('lista').querySelectorAll('.del').forEach(b=>b.onclick=()=>{if(confirm('Excluir este gasto?')){expenses.splice(+b.dataset.i,1);save();render();}});
+  const cf=$('clearF'); if(cf)cf.onclick=()=>{filterOwner=null;render();};
+  $('ownNayma').classList.toggle('active',filterOwner==='nayma');
+  $('ownIrene').classList.toggle('active',filterOwner==='irene');
+  // conferência aportes vs contas
+  const somaCont=(cfg.inter||0)+(cfg.nomad||0), somaAp=(cfg.apNali||0)+(cfg.apNdes||0)+(cfg.apIali||0)+(cfg.apIdes||0);
+  const c=$('cfgCheck');
+  if(somaCont||somaAp){
+    if(Math.abs(somaCont-somaAp)<0.01) c.textContent='✅ Aportes (Família+Irene) batem com as contas: $ '+fmt(somaAp);
+    else c.textContent='⚠️ Aportes somam $ '+fmt(somaAp)+' e contas somam $ '+fmt(somaCont)+' (diferença $ '+fmt(Math.abs(somaCont-somaAp))+').';
+  } else c.textContent='';
+}
+
+$('seg').querySelectorAll('button').forEach(b=>b.onclick=()=>{rateio=b.dataset.r;document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b));});
+$('segCat').querySelectorAll('button').forEach(b=>b.onclick=()=>{catSel=b.dataset.c;document.querySelectorAll('#segCat button').forEach(x=>x.classList.toggle('on',x===b));});
+$('ownNayma').onclick=()=>{filterOwner=(filterOwner==='nayma')?null:'nayma';render();};
+$('ownIrene').onclick=()=>{filterOwner=(filterOwner==='irene')?null:'irene';render();};
+$('add').onclick=()=>{
+  const desc=$('desc').value.trim(), valor=parseFloat($('valor').value)||0, conta=$('conta').value;
+  if(valor<=0){toast('Digite um valor maior que zero.');return;}
+  const gastoConta=expenses.filter(x=>x.conta===conta).reduce((a,x)=>a+x.valor,0);
+  const restaConta=(conta==='Inter'?(cfg.inter||0):(cfg.nomad||0))-gastoConta;
+  if(valor>restaConta+0.001){
+    if(!confirm('⚠️ Este gasto de US$ '+fmt(valor)+' é MAIOR que o saldo restante da conta '+conta+' (US$ '+fmt(restaConta)+').\n\nA conta vai ficar negativa. Adicionar mesmo assim?')) return;
+  }
+  const di=$('dataIn').value; let data;
+  if(di){const p=di.split('-'); data=p[2]+'/'+p[1]+'/'+p[0];}
+  else{const d=new Date(); data=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+  expenses.unshift({desc,valor,conta,cat:catSel,rateio,data}); save(); render();
+  $('desc').value=''; $('valor').value=''; $('dataIn').value=''; $('desc').focus(); toast('✅ Gasto adicionado!');
+};
+$('saveCfg').onclick=()=>{
+  cfg.inter=parseFloat($('cfgInter').value)||0; cfg.nomad=parseFloat($('cfgNomad').value)||0;
+  cfg.apNali=parseFloat($('cfgApNali').value)||0; cfg.apNdes=parseFloat($('cfgApNdes').value)||0;
+  cfg.apIali=parseFloat($('cfgApIali').value)||0; cfg.apIdes=parseFloat($('cfgApIdes').value)||0;
+  cfg.wN=parseFloat($('cfgWN').value)||0; cfg.wI=parseFloat($('cfgWI').value)||0;
+  $('segSplit').textContent=cfg.wN+'/'+cfg.wI; save(); render(); updateCfgSummary(); $('cfgDetails').open=false; toast('✅ Saldos salvos!');
+};
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({expenses,cfg},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='gastos-viagem-'+new Date().toISOString().slice(0,10)+'.json';a.click();};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.expenses)expenses=d.expenses;if(d.cfg)cfg=Object.assign(cfg,d.cfg);save();load();render();toast('✅ Backup importado!');}catch(err){alert('Arquivo inválido.');}};r.readAsText(f);e.target.value='';};
+$('clearBtn').onclick=()=>{if(confirm('Apagar TODOS os gastos? (faça um backup antes)')){expenses=[];localStorage.removeItem(LS_EXP);render();toast('Gastos apagados.');}};
+$('lockBtn').onclick=()=>{location.reload();};
+
+load(); render(); cloudLoad(); cloudSubscribe();
+</script>
+</body>
+</html>
