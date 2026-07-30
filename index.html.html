@@ -13,11 +13,35 @@
 <title>Gastos da Viagem — Orlando</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{--bg:#0f1420;--card:#1a2233;--card2:#212b40;--line:#2c3852;--txt:#e8edf6;--muted:#93a1bd;--accent:#00d18f;--accent2:#4c8dff;--warn:#ffb020;--danger:#ff5a6e;--disney:#c084fc;--rose:#ff6fae;}
+  :root{--bg:#0f1420;--card:#1a1b3a;--card2:#232456;--line:#33356b;--txt:#e8edf6;--muted:#a6a9d8;--accent:#00d18f;--accent2:#6aa8ff;--warn:#ffb020;--danger:#ff5a6e;--disney:#c084fc;--rose:#ff6fae;--gold:#f6c453;}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--txt);padding:16px;line-height:1.45}
+  body{font-family:'Segoe UI',system-ui,Arial,sans-serif;color:var(--txt);padding:16px;line-height:1.45;
+    background:
+      radial-gradient(900px 520px at 85% -8%, rgba(123,47,247,.38), transparent 60%),
+      radial-gradient(820px 520px at 8% 0%, rgba(58,160,255,.30), transparent 60%),
+      linear-gradient(180deg,#1a0f3a 0%,#141642 45%,#0c0f2e 100%);
+    background-attachment:fixed;}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.85;
+    background-image:
+      radial-gradient(1.6px 1.6px at 12% 18%,#fff,transparent),
+      radial-gradient(1.4px 1.4px at 26% 42%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 42% 12%,#fff,transparent),
+      radial-gradient(1.8px 1.8px at 58% 33%,#fff,transparent),
+      radial-gradient(1.3px 1.3px at 73% 16%,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 88% 40%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 18% 70%,#fff,transparent),
+      radial-gradient(1.6px 1.6px at 34% 88%,#fff,transparent),
+      radial-gradient(1.3px 1.3px at 66% 78%,#fff,transparent),
+      radial-gradient(1.7px 1.7px at 82% 92%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 50% 60%,#fff,transparent),
+      radial-gradient(1.4px 1.4px at 95% 66%,#fff,transparent);
+    background-repeat:no-repeat;}
+  .bgdeco{position:fixed;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none;opacity:.05}
   .wrap{max-width:680px;margin:0 auto}
   h1{font-size:22px;font-weight:800;margin-bottom:2px}
+  .h1grad{background:linear-gradient(90deg,#c9a4ff,#8fd4ff 55%,#f6c453);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .card{backdrop-filter:saturate(1.1)}
+  .card h2{color:var(--disney)!important}
   .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
   .card h2{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
@@ -78,8 +102,9 @@
   summary.cfgsum::-webkit-details-marker{display:none}
   summary.cfgsum #cfgSummary{font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);font-size:12px;text-align:right}
   .cfgbody{margin-top:14px}
-  #login{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
-  #login .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 22px;max-width:340px;width:100%;text-align:center}
+  #login{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(700px 400px at 50% 0%, rgba(123,47,247,.5), transparent 60%),linear-gradient(180deg,#1a0f3a,#0c0f2e)}
+  #login .box{background:linear-gradient(160deg,rgba(192,132,252,.15),var(--card));border:1px solid var(--disney);border-radius:16px;padding:28px 22px;max-width:340px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(123,47,247,.35)}
   #login h2{font-size:20px;font-weight:800;margin-bottom:6px;color:var(--txt)}
   #login p{color:var(--muted);font-size:13px;margin-bottom:16px}
   #login input{text-align:center;font-size:22px;letter-spacing:6px}
@@ -87,16 +112,22 @@
 </style>
 </head>
 <body>
+<svg class="bgdeco" aria-hidden="true"><defs>
+  <pattern id="mk" width="150" height="150" patternUnits="userSpaceOnUse" patternTransform="rotate(8)">
+    <g fill="#ffffff"><circle cx="60" cy="70" r="11"/><circle cx="90" cy="70" r="11"/></g>
+  </pattern></defs>
+  <rect width="100%" height="100%" fill="url(#mk)"/>
+</svg>
 <div id="login"><div class="box">
-  <div style="font-size:42px">🔒</div>
-  <h2>Gastos da Viagem</h2>
+  <div style="font-size:44px">🏰</div>
+  <h2>✨ Gastos da Viagem ✨</h2>
   <p>Digite a senha para acessar</p>
   <input type="password" id="loginPass" inputmode="numeric" placeholder="senha" autocomplete="off">
   <button class="btn" id="loginBtn" style="margin-top:6px">Entrar</button>
   <div class="err" id="loginErr"></div>
 </div></div>
 <div class="wrap">
-  <h1>💵 Gastos da Viagem — Orlando</h1>
+  <h1>🏰 <span class="h1grad">Gastos da Viagem — Orlando</span> ✨</h1>
   <div class="sub">Registre cada gasto em dólar. Tudo fica salvo neste aparelho automaticamente.</div>
   <div class="toast" id="toast"></div>
 
@@ -110,7 +141,7 @@
           <div><label>Inter (US$)</label><input type="number" id="cfgInter" step="0.01" inputmode="decimal" placeholder="0,00"></div>
           <div><label>Nomad (US$)</label><input type="number" id="cfgNomad" step="0.01" inputmode="decimal" placeholder="0,00"></div>
         </div>
-        <label>Aportes Família Nayma (US$)</label>
+        <label>Aportes Família Cris e Na (US$)</label>
         <div class="row">
           <div><label>🍽️ Alimentação</label><input type="number" id="cfgApNali" step="0.01" inputmode="decimal" placeholder="0,00"></div>
           <div><label>🧾 Despesas Gerais</label><input type="number" id="cfgApNdes" step="0.01" inputmode="decimal" placeholder="0,00"></div>
@@ -123,7 +154,7 @@
         <details>
           <summary>Pesos do rateio dividido (padrão 75/25)</summary>
           <div class="row" style="margin-top:10px">
-            <div><label>Família Nayma (%)</label><input type="number" id="cfgWN" step="1" value="75"></div>
+            <div><label>Família Cris e Na (%)</label><input type="number" id="cfgWN" step="1" value="75"></div>
             <div><label>Irene (%)</label><input type="number" id="cfgWI" step="1" value="25"></div>
           </div>
         </details>
@@ -154,7 +185,7 @@
     <label>Rateio</label>
     <div class="seg" id="seg">
       <button data-r="split" class="on">Dividir <b id="segSplit">75/25</b></button>
-      <button data-r="nayma">Só Família Nayma</button>
+      <button data-r="nayma">Só Família Cris e Na</button>
       <button data-r="irene">Só Irene</button>
     </div>
     <button class="btn" id="add">Adicionar gasto</button>
@@ -165,7 +196,7 @@
     <h2>📊 Saldos</h2>
     <div class="owners">
       <div class="owner nayma" id="ownNayma">
-        <div class="who">👨‍👩‍👦 Família Nayma</div>
+        <div class="who">👨‍👩‍👦 Família Cris e Na</div>
         <div class="catline">🍽️ Alimentação<span id="sNali">$ 0,00</span></div>
         <div class="catline">🧾 Despesas<span id="sNdes">$ 0,00</span></div>
         <div class="saldo" id="sNayma">$ 0,00</div><div class="det">saldo total</div>
@@ -204,7 +235,11 @@
 // ---- Login (senha cifrada) ----
 const PWHASH='c77639710bd89eea8855346472b0eb9175987e0eaeb35df92b1712ca09215f05';
 function sha256(ascii){function r(v,a){return (v>>>a)|(v<<(32-a));}var mp=Math.pow,mw=mp(2,32),res='',words=[],bl=ascii.length*8;var hash=sha256.h=sha256.h||[],k=sha256.k=sha256.k||[],pc=k.length,ic={};for(var cand=2;pc<64;cand++){if(!ic[cand]){for(var i=0;i<313;i+=cand){ic[i]=cand;}hash[pc]=(mp(cand,.5)*mw)|0;k[pc++]=(mp(cand,1/3)*mw)|0;}}ascii+='\x80';while(ascii.length%64-56)ascii+='\x00';for(i=0;i<ascii.length;i++){var j=ascii.charCodeAt(i);if(j>>8)return;words[i>>2]|=j<<((3-i)%4)*8;}words[words.length]=(bl/mw)|0;words[words.length]=bl;for(j=0;j<words.length;){var w=words.slice(j,j+=16),oh=hash;hash=hash.slice(0,8);for(i=0;i<64;i++){var w15=w[i-15],w2=w[i-2],a=hash[0],e=hash[4];var t1=hash[7]+(r(e,6)^r(e,11)^r(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(r(w15,7)^r(w15,18)^(w15>>>3))+w[i-7]+(r(w2,17)^r(w2,19)^(w2>>>10)))|0);var t2=(r(a,2)^r(a,13)^r(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));hash=[(t1+t2)|0].concat(hash);hash[4]=(hash[4]+t1)|0;}for(i=0;i<8;i++){hash[i]=(hash[i]+oh[i])|0;}}for(i=0;i<8;i++){for(j=3;j+1;j--){var b=(hash[i]>>(j*8))&255;res+=((b<16)?0:'')+b.toString(16);}}return res;}
-function unlock(){document.getElementById('login').style.display='none';}
+let idleT=null;
+function lock(){const l=document.getElementById('login');l.style.display='flex';document.getElementById('loginPass').value='';document.getElementById('loginErr').textContent='';try{document.getElementById('loginPass').focus();}catch(e){}}
+function resetIdle(){clearTimeout(idleT);idleT=setTimeout(lock,60000);} // bloqueia após 1 min sem uso
+function unlock(){document.getElementById('login').style.display='none';resetIdle();}
+['click','keydown','touchstart','input','scroll'].forEach(ev=>document.addEventListener(ev,function(){if(document.getElementById('login').style.display==='none')resetIdle();},{passive:true}));
 function tryLogin(){const v=document.getElementById('loginPass').value;if(sha256(v)===PWHASH){unlock();}else{document.getElementById('loginErr').textContent='Senha incorreta.';document.getElementById('loginPass').value='';}}
 document.getElementById('loginBtn').onclick=tryLogin;
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
@@ -217,7 +252,7 @@ const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const sb=(window.supabase && /^https?:\/\//.test(SUPABASE_URL))?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 // ================================================================
 let expenses=[], cfg={inter:0,nomad:0,apNali:0,apNdes:0,apIali:0,apIdes:0,wN:75,wI:25}, rateio='split', catSel='ali', filterOwner=null;
-const fmt=n=>(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt=n=>Math.round(n||0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
 let _tt=null; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2500);}
 const $=id=>document.getElementById(id);
 
@@ -261,12 +296,12 @@ function render(){
   $('totGasto').textContent='$ '+fmt(total);
   // lista (com filtro por responsável)
   $('count').textContent=expenses.length;
-  const rlabel={split:'Rateio '+cfg.wN+'/'+cfg.wI,nayma:'Só Nayma',irene:'Só Irene'};
+  const rlabel={split:'Rateio '+cfg.wN+'/'+cfg.wI,nayma:'Só Cris e Na',irene:'Só Irene'};
   const clabel={ali:'🍽️ Alim.',des:'🧾 Desp.'};
   let rows=expenses.map((e,i)=>({e,i}));
   if(filterOwner) rows=rows.filter(o=>shares(o.e)[filterOwner]>0.0001);
   let banner='';
-  if(filterOwner){const nome=filterOwner==='nayma'?'Família Nayma':'Irene'; banner='<div class="filterbar">🔎 Só <b>&nbsp;'+nome+'</b> — '+rows.length+' lançamento(s) <button id="clearF">ver todos</button></div>';}
+  if(filterOwner){const nome=filterOwner==='nayma'?'Família Cris e Na':'Irene'; banner='<div class="filterbar">🔎 Só <b>&nbsp;'+nome+'</b> — '+rows.length+' lançamento(s) <button id="clearF">ver todos</button></div>';}
   if(!rows.length){$('lista').innerHTML=banner+'<div class="empty">Nenhum gasto'+(filterOwner?' desse responsável.':' ainda. Adicione o primeiro acima. ✈️')+'</div>';}
   else{$('lista').innerHTML=banner+rows.map(o=>{const e=o.e; const val=filterOwner?shares(e)[filterOwner]:e.valor;
     const extra=(filterOwner&&e.rateio==='split')?'<span class="tag split">parte de $ '+fmt(e.valor)+'</span>':'';
